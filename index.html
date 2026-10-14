@@ -35,6 +35,11 @@
             --amber-bg: rgba(154, 103, 0, 0.12);
             --red-bg: rgba(207, 34, 46, 0.12);
             --muted-bg: rgba(87, 96, 106, 0.12);
+
+            /* Category colors (dashboard) — validated for colorblind separation */
+            --ladies: #BF3989;
+            --men: #0969DA;
+            --other: #8C959F;
         }
 
         body.theme-dark {
@@ -58,6 +63,10 @@
             --amber-bg: rgba(210, 153, 34, 0.12);
             --red-bg: rgba(248, 81, 73, 0.12);
             --muted-bg: rgba(139, 148, 158, 0.12);
+
+            --ladies: #DB61A2;
+            --men: #388BFD;
+            --other: #6E7681;
         }
 
         *,
@@ -640,6 +649,781 @@
             color: var(--accent);
         }
 
+        /* ── Tabs ── */
+        .tabs {
+            display: inline-flex;
+            gap: 4px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            padding: 4px;
+            margin: -12px 0 32px;
+            cursor: default;
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+
+        .tab {
+            font-family: var(--display);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--muted);
+            background: transparent;
+            border: none;
+            border-radius: 999px;
+            padding: 8px 20px;
+            cursor: pointer;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .tab:hover {
+            color: var(--text);
+        }
+
+        .tab.active {
+            background: var(--accent-bg);
+            color: var(--accent);
+        }
+
+        .tab:focus-visible {
+            outline: none;
+            box-shadow: var(--focus-shadow);
+        }
+
+        body.on-dashboard .search-wrap,
+        body.on-dashboard #results {
+            display: none;
+        }
+
+        /* ── Dashboard ── */
+        #dashboard {
+            display: none;
+            width: 100%;
+            max-width: 760px;
+            cursor: default;
+        }
+
+        body.on-dashboard #dashboard {
+            display: block;
+        }
+
+        #dashboard .api-status-wrap {
+            margin: -20px 0 22px;
+        }
+
+        .kpis {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .kpi {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 16px 14px;
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+
+        .kpi-lbl {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 10px;
+        }
+
+        .swatch {
+            width: 8px;
+            height: 8px;
+            border-radius: 2px;
+            flex-shrink: 0;
+            display: inline-block;
+        }
+
+        .kpi-num {
+            font-family: var(--mono);
+            font-size: 26px;
+            font-weight: 600;
+            line-height: 1;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .kpi-sub {
+            font-size: 11px;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px 20px;
+            margin-bottom: 12px;
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+
+        .panel-h {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 10px;
+            font-family: var(--display);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 14px;
+        }
+
+        .panel-h small {
+            font-family: var(--body);
+            font-size: 12px;
+            font-weight: 400;
+            color: var(--muted);
+        }
+
+        /* Part-to-whole bar */
+        .split {
+            position: relative;
+            display: flex;
+            gap: 2px;
+            height: 14px;
+            margin-bottom: 14px;
+        }
+
+        .split-seg {
+            height: 100%;
+            min-width: 4px;
+            border-radius: 2px;
+            background: var(--c);
+            transition: opacity 0.15s ease, width 0.5s ease;
+        }
+
+        .split-seg:first-of-type {
+            border-radius: 4px 2px 2px 4px;
+        }
+
+        .split-seg:last-of-type {
+            border-radius: 2px 4px 4px 2px;
+        }
+
+        /* Narrow Mix: stripes in the category's own color */
+        .hatch {
+            background: repeating-linear-gradient(135deg, var(--c) 0 3px, transparent 3px 6px);
+            background: repeating-linear-gradient(135deg, var(--c) 0 3px, color-mix(in srgb, var(--c) 28%, var(--surface)) 3px 6px);
+        }
+
+        .swatch.hatch {
+            width: 10px;
+            height: 10px;
+            background: repeating-linear-gradient(135deg, var(--c) 0 2px, transparent 2px 4px);
+            box-shadow: inset 0 0 0 1px var(--c);
+        }
+
+        .kpi-mix {
+            margin-top: 12px;
+            padding: 8px 10px;
+            border-left: 3px solid var(--c);
+            border-radius: 4px 8px 8px 4px;
+            background: var(--surface2);
+            background: color-mix(in srgb, var(--c) 10%, var(--surface));
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .mix-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--text);
+        }
+
+        .mix-line>span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .mix-line b {
+            font-family: var(--mono);
+            font-weight: 600;
+        }
+
+        .mix-line.rest,
+        .mix-line.rest>span,
+        .mix-line.rest b {
+            color: var(--muted);
+            font-weight: 400;
+        }
+
+        .legend-mix {
+            color: var(--muted);
+        }
+
+        .split:hover .split-seg:not(:hover) {
+            opacity: 0.4;
+        }
+
+        .tip {
+            position: absolute;
+            bottom: calc(100% + 8px);
+            transform: translateX(-50%);
+            background: var(--text);
+            color: var(--bg);
+            font-family: var(--mono);
+            font-size: 11px;
+            padding: 6px 9px;
+            border-radius: 6px;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.12s ease;
+            z-index: 5;
+        }
+
+        .tip.show {
+            opacity: 1;
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 20px;
+            font-size: 12px;
+            color: var(--text);
+        }
+
+        .legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .legend-item b {
+            font-family: var(--mono);
+            font-weight: 600;
+        }
+
+        .legend-item .pct {
+            font-family: var(--mono);
+            color: var(--muted);
+        }
+
+        /* Filters */
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px 24px;
+            margin-bottom: 18px;
+        }
+
+        .f-group {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .f-lbl {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .seg {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--mono);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text);
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 7px 12px;
+            cursor: pointer;
+            transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+        }
+
+        .chip:hover {
+            border-color: var(--accent-hover);
+        }
+
+        .chip.on {
+            background: var(--accent-bg);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .chip:focus-visible,
+        .num-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: var(--focus-shadow);
+        }
+
+        .num-input {
+            width: 86px;
+            font-family: var(--mono);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text);
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 7px 10px;
+            outline: none;
+            transition: background 0.3s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        /* Filtered list */
+        .list-meta {
+            font-family: var(--display);
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 8px;
+            padding: 0 10px;
+        }
+
+        .list-meta strong {
+            font-family: var(--mono);
+            color: var(--text);
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            column-gap: 16px;
+            row-gap: 5px;
+            align-items: center;
+            padding: 11px 10px;
+            border-top: 1px solid var(--border);
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        .row:hover,
+        .row:focus-visible {
+            background: var(--surface2);
+            outline: none;
+        }
+
+        .row-main {
+            display: flex;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 4px 10px;
+            min-width: 0;
+        }
+
+        .row-art {
+            font-family: var(--mono);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .row-size {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .cat {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .row-name {
+            font-size: 12px;
+            color: var(--muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .row-stock {
+            grid-column: 2;
+            grid-row: 1 / span 2;
+            font-family: var(--mono);
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+            text-align: right;
+        }
+
+        .row-bar {
+            grid-column: 1 / -1;
+            height: 3px;
+            background: var(--border);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .row-bar i {
+            display: block;
+            height: 100%;
+            border-radius: 2px;
+        }
+
+        /* Stock report table */
+        .panel-h {
+            flex-wrap: wrap;
+        }
+
+        .report-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .report-actions .chip {
+            font-family: var(--display);
+            padding: 6px 12px;
+        }
+
+        .report-wrap {
+            overflow-x: auto;
+        }
+
+        .report {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            color: var(--text);
+        }
+
+        .report th,
+        .report td {
+            padding: 9px 10px;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .report th:first-child,
+        .report td:first-child {
+            text-align: left;
+            padding-left: 0;
+        }
+
+        .report thead th {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .report thead th .swatch {
+            margin-right: 6px;
+        }
+
+        .report td {
+            font-family: var(--mono);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .report td:first-child {
+            font-family: var(--body);
+            white-space: normal;
+        }
+
+        .report td.nil {
+            color: var(--muted);
+        }
+
+        .report tfoot td {
+            font-weight: 600;
+            border-bottom: none;
+            border-top: 2px solid var(--border);
+        }
+
+        .report .col-total {
+            font-weight: 600;
+        }
+
+        /* Section label rows: "Narrow" / "Without narrow" */
+        .report tr.sec td {
+            font-family: var(--body);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+            padding-top: 16px;
+            padding-bottom: 6px;
+        }
+
+        .report tr.nar td:first-child,
+        .report tr.reg td:first-child {
+            padding-left: 10px;
+        }
+
+        /* Narrow section is shaded with an accent edge */
+        .report tr.nar td {
+            background: var(--surface2);
+        }
+
+        .report tr.nar td:first-child {
+            box-shadow: inset 3px 0 0 var(--accent);
+        }
+
+        .report tr.subtot td {
+            font-weight: 600;
+        }
+
+        /* Drill-down */
+        .report-hint {
+            font-size: 12px;
+            color: var(--muted);
+            margin: -4px 0 6px;
+        }
+
+        .report tr.drill {
+            cursor: pointer;
+        }
+
+        .report tr.drill:hover td,
+        .report tr.drill:focus-visible td,
+        .report tr.drill.open td {
+            background: var(--accent-bg);
+        }
+
+        .report tr.drill:focus-visible {
+            outline: none;
+        }
+
+        .chev {
+            display: inline-block;
+            width: 14px;
+            font-size: 10px;
+            color: var(--muted);
+            transition: transform 0.15s ease;
+        }
+
+        .report tr.drill.open .chev {
+            transform: rotate(90deg);
+            color: var(--accent);
+        }
+
+        .report tr.detail td {
+            padding: 0 0 14px;
+            text-align: left;
+            white-space: normal;
+            font-family: var(--body);
+            background: transparent;
+        }
+
+        .detail-box {
+            border: 1px solid var(--accent);
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+            padding: 12px 14px;
+            background: var(--surface);
+        }
+
+        .detail-head {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 6px 12px;
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        .detail-head b {
+            color: var(--text);
+        }
+
+        .detail-check {
+            font-family: var(--mono);
+            font-weight: 600;
+        }
+
+        .detail-check.ok {
+            color: var(--green);
+        }
+
+        .detail-check.bad {
+            color: var(--red);
+        }
+
+        .detail-split {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px 16px;
+            font-size: 12px;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .detail-split>span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .detail-split b {
+            font-family: var(--mono);
+        }
+
+        .detail-list {
+            max-height: 340px;
+            overflow-y: auto;
+            border-top: 1px solid var(--border);
+        }
+
+        .d-item {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto auto;
+            align-items: center;
+            gap: 12px;
+            padding: 7px 4px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+        }
+
+        .d-item:hover {
+            background: var(--surface2);
+        }
+
+        .d-main {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .d-sku {
+            font-family: var(--mono);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .d-name {
+            font-size: 11px;
+            color: var(--muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .d-stock {
+            font-family: var(--mono);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            text-align: right;
+            min-width: 48px;
+        }
+
+        .d-stock.zero {
+            color: var(--muted);
+            font-weight: 400;
+        }
+
+        .report-fallback {
+            display: block;
+            width: 100%;
+            min-height: 240px;
+            margin-top: 14px;
+            font-family: var(--mono);
+            font-size: 12px;
+            line-height: 1.5;
+            color: var(--text);
+            background: var(--surface2);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            padding: 12px;
+            resize: vertical;
+            outline: none;
+        }
+
+        .report-fallback[hidden] {
+            display: none;
+        }
+
+        @media print {
+
+            body,
+            body.theme-dark {
+                --bg: #FFFFFF;
+                --surface: #FFFFFF;
+                --surface2: #F4F6F9;
+                --border: #D0D7DE;
+                --text: #1F2328;
+                --muted: #57606A;
+                --accent: #0969DA;
+                --accent-bg: rgba(9, 105, 218, 0.08);
+                --ladies: #BF3989;
+                --men: #0969DA;
+                --other: #8C959F;
+                padding: 0;
+                cursor: default;
+            }
+
+            * {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .top-actions,
+            .tabs,
+            .api-status-wrap,
+            .report-actions,
+            .report-fallback,
+            .report-hint,
+            .chev,
+            .filters,
+            .filter-panel .panel-h small,
+            footer {
+                display: none !important;
+            }
+
+            header {
+                margin-bottom: 20px;
+            }
+
+            #dashboard {
+                max-width: none;
+            }
+
+            .kpi,
+            .panel,
+            .row {
+                break-inside: avoid;
+            }
+        }
+
         footer {
             margin-top: 56px;
             font-size: 11px;
@@ -665,11 +1449,68 @@
                 font-size: 10px;
                 padding: 4px 11px;
             }
+
+            .kpis {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+
+            .kpi-num {
+                font-size: 22px;
+            }
+
+            .kpi {
+                padding: 14px 12px 12px;
+            }
+
+            .kpi-mix {
+                padding: 6px 7px;
+            }
+
+            .mix-line {
+                font-size: 11px;
+                gap: 4px;
+            }
+
+            .mix-line>span {
+                gap: 4px;
+            }
+
+            .panel {
+                padding: 16px 14px;
+            }
+
+            .row {
+                padding: 10px 6px;
+            }
+
+            .row-stock {
+                font-size: 16px;
+            }
+
+            .report {
+                font-size: 12px;
+            }
+
+            .report th,
+            .report td {
+                padding: 8px 5px;
+            }
+
+            .report thead th {
+                font-size: 9px;
+                letter-spacing: 0.06em;
+            }
+
+            .report thead th .swatch {
+                display: none;
+            }
         }
 
         @media (max-width: 480px) {
             body {
-                padding: 32px 12px 48px;
+                /* clear the fixed refresh/theme buttons */
+                padding: 68px 12px 48px;
             }
 
             .sku-card {
@@ -782,6 +1623,11 @@
         <h1>Stock <em>Lookup</em></h1>
     </header>
 
+    <nav class="tabs" role="tablist">
+        <button class="tab active" data-view="lookup" role="tab" aria-selected="true">Lookup</button>
+        <button class="tab" data-view="dashboard" role="tab" aria-selected="false">Dashboard</button>
+    </nav>
+
     <div class="search-wrap">
         <div class="input-box">
             <span class="search-ico">
@@ -800,12 +1646,84 @@
         <div class="api-status-wrap">
             <div id="apiStatus" class="api-status is-checking">
                 <span class="api-dot"></span>
-                <span id="apiStatusText">Connecting…</span>
+                <span class="api-status-text">Connecting…</span>
             </div>
         </div>
     </div>
 
     <div id="results"></div>
+
+    <section id="dashboard">
+        <div class="api-status-wrap">
+            <div class="api-status is-checking">
+                <span class="api-dot"></span>
+                <span class="api-status-text">Connecting…</span>
+            </div>
+        </div>
+
+        <div id="dashState"></div>
+
+        <div id="dashContent" hidden>
+            <div class="kpis" id="kpis"></div>
+
+            <div class="panel">
+                <div class="panel-h">Stock split <small>share of total units</small></div>
+                <div class="split" id="split"></div>
+                <div class="legend" id="legend"></div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-h">
+                    <span>Stock report <small id="reportDate"></small></span>
+                    <span class="report-actions">
+                        <button class="chip" id="copyReport" title="Copy as text — paste into WhatsApp or email">Copy report</button>
+                        <button class="chip" id="printReport" title="Print or save as PDF">Print / PDF</button>
+                    </span>
+                </div>
+                <p class="report-hint">Tap any row to see the SKUs behind it and check the total.</p>
+                <div class="report-wrap">
+                    <table class="report" id="report"></table>
+                </div>
+                <textarea class="report-fallback" id="reportFallback" readonly hidden
+                    aria-label="Report text to copy"></textarea>
+            </div>
+
+            <div class="panel filter-panel">
+                <div class="panel-h">Stock filter <small>tap a row to open it in Lookup</small></div>
+                <div class="filters">
+                    <div class="f-group">
+                        <span class="f-lbl">Stock more than</span>
+                        <div class="seg" id="fMin">
+                            <button class="chip" data-min="10">10</button>
+                            <button class="chip" data-min="50">50</button>
+                            <button class="chip" data-min="70">70</button>
+                            <button class="chip" data-min="100">100</button>
+                            <input class="num-input" id="fMinInput" type="number" min="0" step="1"
+                                inputmode="numeric" placeholder="Custom" aria-label="Custom minimum stock">
+                        </div>
+                    </div>
+                    <div class="f-group">
+                        <span class="f-lbl">Category</span>
+                        <div class="seg" id="fCat">
+                            <button class="chip" data-cat="all">All</button>
+                            <button class="chip" data-cat="ladies"><span class="swatch" style="background:var(--ladies)"></span>Ladies</button>
+                            <button class="chip" data-cat="men"><span class="swatch" style="background:var(--men)"></span>Men</button>
+                            <button class="chip" data-cat="other"><span class="swatch" style="background:var(--other)"></span>Other</button>
+                        </div>
+                    </div>
+                    <div class="f-group">
+                        <span class="f-lbl">Count by</span>
+                        <div class="seg" id="fGroup">
+                            <button class="chip" data-group="size">Size</button>
+                            <button class="chip" data-group="article">Article</button>
+                        </div>
+                    </div>
+                </div>
+                <p class="list-meta" id="listMeta"></p>
+                <div id="list"></div>
+            </div>
+        </div>
+    </section>
 
     <footer>Exact Choice &times; John DV Manufacturing</footer>
 
@@ -813,6 +1731,7 @@
         const API = 'https://script.google.com/macros/s/AKfycbx5Kz4Gz54UOBCw9u62r6sN800NR3dIqgUQB8TP2AYiFVl0sCiVeJw2Y0jSWhietg/exec';
 
         let data = null;
+        let loadedAt = null; // when data was last fetched successfully
         let status = 'idle'; // idle | loading | done | error
         let timer = null;
 
@@ -820,8 +1739,6 @@
         const clearBtn = document.getElementById('clearBtn');
         const results = document.getElementById('results');
         const refreshBtn = document.getElementById('refreshBtn');
-        const apiStatus = document.getElementById('apiStatus');
-        const apiStatusText = document.getElementById('apiStatusText');
 
         /* ─── Boot ─── */
         // Load initial theme
@@ -871,6 +1788,7 @@
                 if (!r.ok) throw new Error('HTTP ' + r.status);
                 const j = await r.json();
                 data = j.data || [];
+                loadedAt = new Date();
                 status = 'done';
                 setApiStatus('ok', `API live · ${data.length.toLocaleString('en-IN')} rows · ${Date.now() - started} ms · ${clockNow()}`);
                 // auto-run if user already typed
@@ -883,15 +1801,19 @@
                 // If user tried to search, show error
                 if (input.value.trim().length >= 1) showError();
             } finally {
+                renderDashboard();
                 refreshBtn.disabled = false;
                 // keep the spin visible briefly even on a fast response
                 setTimeout(() => refreshBtn.classList.remove('spinning'), 400);
             }
         }
 
+        // Lookup and Dashboard each show a status pill; keep them in sync
         function setApiStatus(state, text) {
-            apiStatus.className = 'api-status is-' + state;
-            apiStatusText.textContent = text;
+            document.querySelectorAll('.api-status').forEach(el => {
+                el.className = 'api-status is-' + state;
+                el.querySelector('.api-status-text').textContent = text;
+            });
         }
 
         function clockNow() {
@@ -1072,10 +1994,507 @@
       </div>`;
         }
 
+        /* ─── Dashboard ─── */
+        const CATS = {
+            ladies: { label: 'Ladies', color: 'var(--ladies)' },
+            men: { label: 'Men', color: 'var(--men)' },
+            other: { label: 'Other', color: 'var(--other)' },
+        };
+        const MIN_PRESETS = [10, 50, 70, 100];
+
+        const kpisEl = document.getElementById('kpis');
+        const splitEl = document.getElementById('split');
+        const legendEl = document.getElementById('legend');
+        const listEl = document.getElementById('list');
+        const listMetaEl = document.getElementById('listMeta');
+        const minInput = document.getElementById('fMinInput');
+        const tabs = document.querySelectorAll('.tab');
+
+        // Category comes from the article number (text before the first space):
+        // 3 or 4 digits → Ladies, 5 digits → Men. A letter suffix (e.g. 4504B) counts by its digits.
+        // Text SKUs use the LADIES / MENS word (ALTER LADIES, MIX MENS…);
+        // NARROW MIX without MENS is Ladies. Anything else is Other.
+        function categoryOf(sku) {
+            const s = String(sku || '').toUpperCase().trim();
+            const digits = (s.split(' ')[0].match(/^\d+/) || [''])[0];
+            if (digits.length === 3 || digits.length === 4) return 'ladies';
+            if (digits.length === 5) return 'men';
+            if (/\bLADIES\b/.test(s)) return 'ladies';
+            if (/\bMENS?\b/.test(s)) return 'men';
+            if (/\bMIX\b/.test(s)) return 'ladies';
+            return 'other';
+        }
+
+        // Narrow = Item Name starting with NARROW (also "NARROW OD WITH SCRATCH DESIGN"),
+        // whether or not the SKU has an article number
+        function isNarrow(row) {
+            return /^NARROW\b/.test(String(row['Item Name'] || '').toUpperCase().trim());
+        }
+
+        // Report line: numbered articles together, and each kind of unnumbered
+        // stock (Mix, Alter, Chilad, Samples…) on its own line
+        function bucketOf(sku) {
+            const s = String(sku || '').toUpperCase().trim();
+            if (/^\d/.test(s)) return 'Articles';
+            if (/\bMIX\b/.test(s)) return 'Mix';
+            const name = s.replace(/\b(LADIES|MENS?)\b/g, '').replace(/\b\d+X\d+\b/g, '').replace(/\s+/g, ' ').trim();
+            return name ? name.toLowerCase().replace(/\b\w/g, c => c.toUpperCase()) : 'Unnumbered';
+        }
+
+        // Filter choices are remembered per browser
+        const dash = { min: 50, cat: 'all', group: 'size' };
+        try {
+            const saved = JSON.parse(localStorage.getItem('dashFilters') || '{}');
+            if (Number.isFinite(saved.min) && saved.min >= 0) dash.min = saved.min;
+            if (saved.cat === 'all' || saved.cat in CATS) dash.cat = saved.cat;
+            if (saved.group === 'size' || saved.group === 'article') dash.group = saved.group;
+        } catch (e) { }
+
+        function saveDash() {
+            try { localStorage.setItem('dashFilters', JSON.stringify(dash)); } catch (e) { }
+        }
+
+        /* ─── Tabs (#lookup / #dashboard) ─── */
+        tabs.forEach(t => t.addEventListener('click', () => { location.hash = t.dataset.view; }));
+        window.addEventListener('hashchange', applyView);
+
+        function applyView() {
+            const onDash = location.hash === '#dashboard';
+            document.body.classList.toggle('on-dashboard', onDash);
+            tabs.forEach(t => {
+                const on = t.dataset.view === (onDash ? 'dashboard' : 'lookup');
+                t.classList.toggle('active', on);
+                t.setAttribute('aria-selected', on);
+            });
+            if (onDash) renderDashboard();
+        }
+
+        function renderDashboard() {
+            if (!document.body.classList.contains('on-dashboard')) return;
+            const stateEl = document.getElementById('dashState');
+            const contentEl = document.getElementById('dashContent');
+
+            // On a failed refresh, keep showing the last good data — the pill says it failed
+            if (!data) {
+                contentEl.hidden = true;
+                stateEl.innerHTML = status === 'error' ? `
+      <div class="state">
+        <div class="state-ico">⚠️</div>
+        <div class="state-h">Connection failed</div>
+        <div class="state-sub">Could not reach the inventory server.<br>Tap refresh to try again.</div>
+      </div>` : `
+      <div class="state">
+        <div class="spinner"></div>
+        <div class="state-h">Loading inventory…</div>
+        <div class="state-sub">Connecting to server</div>
+      </div>`;
+                return;
+            }
+
+            stateEl.innerHTML = '';
+            contentEl.hidden = false;
+            renderSummary();
+            syncFilterChips();
+            renderList();
+        }
+
+        /* ─── Totals: KPI tiles, split bar, report table ─── */
+        let report = null; // last computed totals, reused by Copy report
+
+        function renderSummary() {
+            const tally = () => ({ units: 0, sizes: 0, articles: new Set() });
+            const t = { all: tally(), ladies: tally(), men: tally(), other: tally() };
+            const buckets = new Map(); // report line → units per category
+
+            data.forEach(row => {
+                const sku = String(row['SKU Code'] || '').trim();
+                const cat = categoryOf(sku);
+                const units = toNum(row['Closing Stock']);
+                const art = sku.split(' ')[0].toUpperCase();
+                [t.all, t[cat]].forEach(x => {
+                    x.units += units;
+                    x.sizes++;
+                    x.articles.add(cat + '|' + art);
+                });
+                const narrow = isNarrow(row);
+                const key = (narrow ? 'N|' : 'R|') + bucketOf(sku);
+                const line = buckets.get(key) || { narrow, name: bucketOf(sku) };
+                line[cat] = (line[cat] || 0) + units;
+                buckets.set(key, line);
+            });
+
+            // Within each section: Articles first, then the rest by size
+            const lineTotal = l => (l.ladies || 0) + (l.men || 0) + (l.other || 0);
+            const sorted = list => list.sort((a, b) =>
+                (a.name !== 'Articles') - (b.name !== 'Articles') || lineTotal(b) - lineTotal(a));
+            const narrowLines = sorted([...buckets.values()].filter(l => l.narrow));
+            const regularLines = sorted([...buckets.values()].filter(l => !l.narrow));
+            const sumOf = (list, k) => list.reduce((s, l) => s + (l[k] || 0), 0);
+            const cats = Object.keys(CATS).filter(k => t[k].sizes > 0);
+            report = { t, cats, narrowLines, regularLines, sumOf };
+
+            const pct = n => t.all.units ? n / t.all.units * 100 : 0;
+            const mixOf = k => sumOf(narrowLines, k);
+            const mixAll = cats.reduce((s, k) => s + mixOf(k), 0);
+
+            // Narrow gets its own highlighted box: total = without narrow + Narrow
+            const mixBox = (x, mix, color) => !mix ? '' : `
+          <div class="kpi-mix" style="--c:${color}">
+            <div class="mix-line"><span><span class="swatch hatch"></span>Narrow</span><b>${fmt(mix)}</b></div>
+            <div class="mix-line rest"><span>Without narrow</span><b>${fmt(x.units - mix)}</b></div>
+          </div>`;
+
+            const tile = (label, x, sub, color, mix) => `
+        <div class="kpi">
+          <div class="kpi-lbl">${color ? `<span class="swatch" style="background:${color}"></span>` : ''}${label}</div>
+          <div class="kpi-num">${fmt(x.units)}</div>
+          <div class="kpi-sub">${fmt(x.articles.size)} articles · ${fmt(x.sizes)} sizes<br>${sub}</div>
+          ${mixBox(x, mix, color || 'var(--muted)')}
+        </div>`;
+
+            kpisEl.innerHTML = tile('Total stock', t.all, 'units in stock', null, mixAll) +
+                Object.keys(CATS).map(k =>
+                    tile(CATS[k].label, t[k], `${pct(t[k].units).toFixed(1)}% of total`, CATS[k].color, mixOf(k))
+                ).join('');
+
+            // Report table: a Narrow section and a Without-narrow section, each with a subtotal
+            const cell = v => v === undefined ? '<td class="nil">—</td>' : `<td>${fmt(v)}</td>`;
+            // data-key = section|line ("*" = whole section); tapping a row lists its SKUs
+            const row = (cls, name, l, key) => `<tr class="${cls} drill" data-key="${esc(key)}" tabindex="0" aria-expanded="false">
+          <td><span class="chev">▸</span>${esc(name)}</td>${cats.map(k => cell(l[k])).join('')}<td class="col-total">${fmt(lineTotal(l))}</td>
+        </tr>`;
+            const subtotal = list => Object.fromEntries(cats.map(k => [k, sumOf(list, k)]));
+            const section = (title, list, cls, totalLabel) => {
+                if (!list.length) return '';
+                const sec = cls === 'nar' ? 'N' : 'R';
+                return `<tr class="sec"><td colspan="${cats.length + 2}">${title}</td></tr>` +
+                    list.map(l => row(cls, l.name, l, sec + '|' + l.name)).join('') +
+                    row(cls + ' subtot', totalLabel, subtotal(list), sec + '|*');
+            };
+            document.getElementById('report').innerHTML = `
+        <thead><tr>
+          <th>Stock type</th>
+          ${cats.map(k => `<th><span class="swatch" style="background:${CATS[k].color}"></span>${CATS[k].label}</th>`).join('')}
+          <th>Total</th>
+        </tr></thead>
+        <tbody>
+          ${section('Narrow', narrowLines, 'nar', 'Narrow total')}
+          ${section('Without narrow', regularLines, 'reg', 'Without narrow total')}
+        </tbody>
+        <tfoot><tr>
+          <td>Total</td>${cats.map(k => `<td>${fmt(t[k].units)}</td>`).join('')}<td>${fmt(t.all.units)}</td>
+        </tr></tfoot>`;
+            document.getElementById('reportDate').textContent = loadedAt ? '· as of ' + stamp(loadedAt) : '';
+
+            // Each category's bar is split into its regular stock (solid) and Narrow (striped)
+            const segs = [];
+            Object.keys(CATS).filter(k => t[k].units > 0).forEach(k => {
+                const mix = mixOf(k);
+                const rest = t[k].units - mix;
+                if (rest > 0) segs.push({ k, units: rest, label: CATS[k].label + (mix ? ' · without narrow' : ''), hatch: false });
+                if (mix > 0) segs.push({ k, units: mix, label: CATS[k].label + ' · Narrow', hatch: true });
+            });
+            splitEl.innerHTML = segs.map(s => `
+        <div class="split-seg${s.hatch ? ' hatch' : ''}" tabindex="0" style="flex:${s.units} 1 0;--c:${CATS[s.k].color}"
+          data-tip="${s.label} · ${fmt(s.units)} units · ${pct(s.units).toFixed(1)}%"
+          aria-label="${s.label}: ${fmt(s.units)} units, ${pct(s.units).toFixed(1)}%"></div>`).join('') +
+                '<span class="tip" id="splitTip"></span>';
+
+            legendEl.innerHTML = Object.keys(CATS).map(k => `
+        <span class="legend-item">
+          <span class="swatch" style="background:${CATS[k].color}"></span>${CATS[k].label}
+          <b>${fmt(t[k].units)}</b><span class="pct">${pct(t[k].units).toFixed(1)}%</span>
+        </span>`).join('') + (mixAll ? `
+        <span class="legend-item legend-mix">
+          <span class="swatch hatch" style="--c:var(--muted)"></span>Striped = Narrow
+          <b>${fmt(mixAll)}</b><span class="pct">${pct(mixAll).toFixed(1)}%</span>
+        </span>` : '');
+        }
+
+        // Split-bar tooltip (hover or keyboard focus)
+        function showTip(seg) {
+            const tip = document.getElementById('splitTip');
+            if (!tip) return;
+            tip.textContent = seg.dataset.tip;
+            const half = tip.offsetWidth / 2;
+            const mid = seg.offsetLeft + seg.offsetWidth / 2;
+            tip.style.left = Math.min(Math.max(mid, half), splitEl.clientWidth - half) + 'px';
+            tip.classList.add('show');
+        }
+        function hideTip() {
+            const tip = document.getElementById('splitTip');
+            if (tip) tip.classList.remove('show');
+        }
+        splitEl.addEventListener('mouseover', e => { const s = e.target.closest('.split-seg'); if (s) showTip(s); });
+        splitEl.addEventListener('mouseleave', hideTip);
+        splitEl.addEventListener('focusin', e => { const s = e.target.closest('.split-seg'); if (s) showTip(s); });
+        splitEl.addEventListener('focusout', hideTip);
+
+        /* ─── Report drill-down: tap a row to list the SKUs that make up its numbers ─── */
+        const reportEl = document.getElementById('report');
+
+        reportEl.addEventListener('click', e => {
+            const item = e.target.closest('.d-item');
+            if (item) { openInLookup(item.dataset.art); return; }
+            const tr = e.target.closest('tr.drill');
+            if (tr) toggleDetail(tr);
+        });
+        reportEl.addEventListener('keydown', e => {
+            const tr = e.target.closest('tr.drill');
+            if (tr && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggleDetail(tr); }
+        });
+
+        function toggleDetail(tr) {
+            const wasOpen = tr.classList.contains('open');
+            reportEl.querySelectorAll('tr.detail').forEach(d => d.remove());
+            reportEl.querySelectorAll('tr.drill.open').forEach(d => {
+                d.classList.remove('open');
+                d.setAttribute('aria-expanded', 'false');
+            });
+            if (wasOpen) return;
+
+            const [sec, name] = tr.dataset.key.split('|');
+            const order = { ladies: 0, men: 1, other: 2 };
+            const items = data
+                .filter(r => isNarrow(r) === (sec === 'N') && (name === '*' || bucketOf(r['SKU Code']) === name))
+                .map(r => {
+                    const raw = r['Closing Stock'];
+                    const sku = String(r['SKU Code'] || '').trim();
+                    return {
+                        sku, art: sku.split(' ')[0], name: r['Item Name'] || '', cat: categoryOf(sku),
+                        stock: raw === '' || raw === null || raw === undefined ? null : toNum(raw),
+                    };
+                })
+                .sort((a, b) => order[a.cat] - order[b.cat] || (b.stock ?? -1) - (a.stock ?? -1));
+
+            const byCat = {};
+            items.forEach(i => { byCat[i.cat] = (byCat[i.cat] || 0) + (i.stock || 0); });
+            const sum = items.reduce((s, i) => s + (i.stock || 0), 0);
+            const shown = Number(tr.querySelector('.col-total').textContent.replace(/[^\d]/g, ''));
+            const label = tr.querySelector('td').textContent.replace('▸', '').trim();
+            const section = sec === 'N' ? 'Narrow' : 'Without narrow';
+
+            tr.insertAdjacentHTML('afterend', `
+        <tr class="detail"><td colspan="${tr.children.length}">
+          <div class="detail-box">
+            <div class="detail-head">
+              <span><b>${esc(label)}</b> · ${section} · ${fmt(items.length)} SKU${items.length === 1 ? '' : 's'}</span>
+              <span class="detail-check ${sum === shown ? 'ok' : 'bad'}">
+                Sum ${fmt(sum)} ${sum === shown ? '= report ✓' : '≠ report ' + fmt(shown)}
+              </span>
+            </div>
+            <div class="detail-split">${Object.keys(order).filter(k => k in byCat).map(k =>
+                `<span><span class="swatch" style="background:${CATS[k].color}"></span>${CATS[k].label} <b>${fmt(byCat[k])}</b></span>`).join('')}
+            </div>
+            <div class="detail-list">${items.map(i => `
+              <div class="d-item" data-art="${esc(i.art)}" title="Open ${esc(i.art)} in Lookup">
+                <span class="d-main">
+                  <span class="d-sku">${esc(i.sku)}</span>
+                  <span class="d-name">${esc(i.name)}</span>
+                </span>
+                <span class="cat"><span class="swatch" style="background:${CATS[i.cat].color}"></span>${CATS[i.cat].label}</span>
+                <span class="d-stock${i.stock ? '' : ' zero'}">${i.stock === null ? '—' : fmt(i.stock)}</span>
+              </div>`).join('')}
+            </div>
+          </div>
+        </td></tr>`);
+
+            tr.classList.add('open');
+            tr.setAttribute('aria-expanded', 'true');
+            tr.nextElementSibling.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
+
+        /* ─── Share: copy as WhatsApp-ready text, or print / save PDF ─── */
+        function reportText() {
+            const { t, cats, narrowLines, regularLines, sumOf } = report;
+            const pct = n => t.all.units ? (n / t.all.units * 100).toFixed(1) + '%' : '0%';
+            const out = [
+                '*John DV — Stock Report*',
+                loadedAt ? 'As of ' + stamp(loadedAt) : '',
+                '',
+                `*Total stock: ${fmt(t.all.units)} units*`,
+            ];
+            cats.forEach(k => {
+                out.push('', `*${CATS[k].label}: ${fmt(t[k].units)}* (${pct(t[k].units)})`);
+                [['Narrow', narrowLines], ['Without narrow', regularLines]].forEach(([title, list]) => {
+                    const sub = sumOf(list, k);
+                    if (!sub) return;
+                    out.push(`_${title}: ${fmt(sub)}_`);
+                    list.forEach(l => { if (l[k]) out.push(`   • ${l.name}: ${fmt(l[k])}`); });
+                });
+            });
+            return out.join('\n');
+        }
+
+        async function copyText(text) {
+            try {
+                await navigator.clipboard.writeText(text);
+                return true;
+            } catch (e) {
+                // older browsers / non-https: fall back to a hidden textarea
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                ta.style.cssText = 'position:fixed;opacity:0';
+                document.body.appendChild(ta);
+                ta.select();
+                const ok = document.execCommand('copy');
+                ta.remove();
+                return ok;
+            }
+        }
+
+        const copyBtn = document.getElementById('copyReport');
+        copyBtn.addEventListener('click', async () => {
+            if (!report) return;
+            const text = reportText();
+            const ok = await copyText(text);
+            const box = document.getElementById('reportFallback');
+            if (ok) {
+                box.hidden = true;
+                copyBtn.textContent = 'Copied ✓';
+                setTimeout(() => { copyBtn.textContent = 'Copy report'; }, 2000);
+            } else {
+                // clipboard blocked — show the text ready to select and copy by hand
+                box.value = text;
+                box.hidden = false;
+                box.focus();
+                box.select();
+                copyBtn.textContent = 'Copy from box below';
+                setTimeout(() => { copyBtn.textContent = 'Copy report'; }, 4000);
+            }
+        });
+        document.getElementById('printReport').addEventListener('click', () => window.print());
+
+        /* ─── Stock filter ─── */
+        function syncFilterChips() {
+            document.querySelectorAll('#fMin .chip').forEach(c => c.classList.toggle('on', Number(c.dataset.min) === dash.min));
+            if (document.activeElement !== minInput) minInput.value = MIN_PRESETS.includes(dash.min) ? '' : dash.min;
+            document.querySelectorAll('#fCat .chip').forEach(c => c.classList.toggle('on', c.dataset.cat === dash.cat));
+            document.querySelectorAll('#fGroup .chip').forEach(c => c.classList.toggle('on', c.dataset.group === dash.group));
+        }
+
+        function onFilter() {
+            saveDash();
+            syncFilterChips();
+            renderList();
+        }
+
+        document.getElementById('fMin').addEventListener('click', e => {
+            const c = e.target.closest('.chip');
+            if (c) { dash.min = Number(c.dataset.min); minInput.value = ''; onFilter(); }
+        });
+        minInput.addEventListener('input', () => {
+            const n = Math.floor(Number(minInput.value));
+            if (minInput.value.trim() === '' || !Number.isFinite(n) || n < 0) return;
+            dash.min = n;
+            onFilter();
+        });
+        document.getElementById('fCat').addEventListener('click', e => {
+            const c = e.target.closest('.chip');
+            if (c) { dash.cat = c.dataset.cat; onFilter(); }
+        });
+        document.getElementById('fGroup').addEventListener('click', e => {
+            const c = e.target.closest('.chip');
+            if (c) { dash.group = c.dataset.group; onFilter(); }
+        });
+
+        function renderList() {
+            let rows = data.map(r => {
+                const sku = String(r['SKU Code'] || '').trim();
+                const parts = sku.split(' ');
+                const raw = r['Closing Stock'];
+                return {
+                    art: parts[0],
+                    size: parts.slice(1).join(' ') || '—',
+                    name: r['Item Name'] || '',
+                    cat: categoryOf(sku),
+                    stock: raw === '' || raw === null || raw === undefined ? null : toNum(raw),
+                };
+            });
+
+            // "Article" adds up all sizes of an article (kept apart by category, e.g. ALTER MENS / ALTER LADIES)
+            if (dash.group === 'article') {
+                const groups = new Map();
+                rows.forEach(r => {
+                    const key = r.cat + '|' + r.art.toUpperCase();
+                    const g = groups.get(key) || { art: r.art, cat: r.cat, name: r.name, stock: null, sizes: 0 };
+                    g.sizes++;
+                    if (r.stock !== null) g.stock = (g.stock || 0) + r.stock;
+                    groups.set(key, g);
+                });
+                rows = [...groups.values()].map(g => ({ ...g, size: g.sizes + (g.sizes === 1 ? ' size' : ' sizes') }));
+            }
+
+            const hits = rows
+                .filter(r => r.stock !== null && r.stock > dash.min && (dash.cat === 'all' || r.cat === dash.cat))
+                .sort((a, b) => b.stock - a.stock);
+            const units = hits.reduce((s, r) => s + r.stock, 0);
+            const noun = (dash.group === 'article' ? 'article' : 'size') + (hits.length === 1 ? '' : 's');
+            const catTxt = dash.cat === 'all' ? '' : ' ' + CATS[dash.cat].label;
+
+            listMetaEl.innerHTML = `<strong>${fmt(hits.length)}</strong>${catTxt} ${noun} with more than
+        <strong>${fmt(dash.min)}</strong> units · <strong>${fmt(units)}</strong> units total`;
+
+            if (!hits.length) {
+                listEl.innerHTML = `
+      <div class="state" style="border:none;padding:28px 12px">
+        <div class="state-h">Nothing above ${fmt(dash.min)}</div>
+        <div class="state-sub">Try a lower number or another category.</div>
+      </div>`;
+                return;
+            }
+
+            const top = hits[0].stock || 1;
+            listEl.innerHTML = hits.map(r => `
+        <div class="row" role="button" tabindex="0" data-art="${esc(r.art)}" title="Open ${esc(r.art)} in Lookup">
+          <div class="row-main">
+            <span class="row-art">#${esc(r.art)}</span>
+            <span class="row-size">${esc(r.size)}</span>
+            <span class="cat"><span class="swatch" style="background:${CATS[r.cat].color}"></span>${CATS[r.cat].label}</span>
+          </div>
+          <div class="row-stock">${fmt(r.stock)}</div>
+          <div class="row-name">${esc(r.name)}</div>
+          <div class="row-bar"><i style="width:${Math.max(1, r.stock / top * 100)}%;background:${CATS[r.cat].color}"></i></div>
+        </div>`).join('');
+        }
+
+        // Tapping a row opens that article in the Lookup tab
+        listEl.addEventListener('click', e => {
+            const r = e.target.closest('.row');
+            if (r) openInLookup(r.dataset.art);
+        });
+        listEl.addEventListener('keydown', e => {
+            const r = e.target.closest('.row');
+            if (r && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openInLookup(r.dataset.art); }
+        });
+
+        function openInLookup(art) {
+            location.hash = 'lookup';
+            input.value = art;
+            clearBtn.classList.add('show');
+            run(art);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        applyView();
+
         /* ─── Utility ─── */
         function toNum(v) {
             if (v === '' || v === null || v === undefined) return 0;
             return Number(v) || 0;
+        }
+
+        function fmt(n) {
+            return n.toLocaleString('en-IN');
+        }
+
+        // e.g. "14 Oct 2026, 4:45 pm"
+        function stamp(d) {
+            return d.toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+        }
+
+        function esc(s) {
+            return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
         }
     </script>
 
