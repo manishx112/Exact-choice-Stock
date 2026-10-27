@@ -40,6 +40,11 @@
             --ladies: #BF3989;
             --men: #0969DA;
             --other: #8C959F;
+
+            /* Background circuit lines */
+            --grid-dot: rgba(87, 96, 106, 0.16);
+            --flow-line: rgba(9, 105, 218, 0.24);
+            --flow-glow: #0969DA;
         }
 
         body.theme-dark {
@@ -67,6 +72,10 @@
             --ladies: #DB61A2;
             --men: #388BFD;
             --other: #6E7681;
+
+            --grid-dot: rgba(139, 148, 158, 0.14);
+            --flow-line: rgba(79, 195, 247, 0.32);
+            --flow-glow: #4FC3F7;
         }
 
         *,
@@ -87,7 +96,30 @@
             align-items: center;
             padding: 48px 16px 64px;
             cursor: pointer;
-            transition: background 0.3s ease, color 0.3s ease;
+            background-image: radial-gradient(var(--grid-dot) 1px, transparent 1.3px);
+            background-size: 22px 22px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Circuit lines: fixed behind everything, never catches clicks,
+           faded in the middle so text stays easy to read */
+        #flow {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 14%, rgba(0, 0, 0, 0.3) 32%, rgba(0, 0, 0, 0.3) 68%, #000 86%, #000 100%);
+            mask-image: linear-gradient(90deg, #000 0%, #000 14%, rgba(0, 0, 0, 0.3) 32%, rgba(0, 0, 0, 0.3) 68%, #000 86%, #000 100%);
+        }
+
+        @media (max-width: 760px) {
+            #flow {
+                -webkit-mask-image: none;
+                mask-image: none;
+                opacity: 0.5;
+            }
         }
 
         /* Prevent default pointer behavior on inner containers so only the background feels clickable */
@@ -250,7 +282,6 @@
             background: var(--surface);
             border: 1.5px solid var(--border);
             border-radius: 14px;
-            overflow: hidden;
             transition: background 0.3s ease, border-color 0.2s, box-shadow 0.2s;
         }
 
@@ -1372,6 +1403,202 @@
             display: none;
         }
 
+        /* Glowing light running around each dashboard card's border */
+        @property --run {
+            syntax: '<angle>';
+            inherits: false;
+            initial-value: 0deg;
+        }
+
+        /* Reusable: add class="glow-border" to any box with a border-radius.
+           Needs @property --run, @keyframes border-run and the --flow-glow color. */
+        .glow-border {
+            position: relative;
+        }
+
+        .glow-border::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: inherit;
+            padding: 1.5px;
+            background: conic-gradient(from var(--run), transparent 0deg 290deg,
+                    color-mix(in srgb, var(--flow-glow) 35%, transparent) 320deg, var(--flow-glow) 352deg, transparent 360deg);
+            /* keep only the border ring */
+            -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor;
+            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            mask-composite: exclude;
+            pointer-events: none;
+            animation: border-run var(--glow-speed, 7s) linear infinite;
+            animation-delay: var(--glow-delay, 0s);
+        }
+
+        /* stagger the cards so the lights don't move in lockstep */
+        .kpi:nth-child(2) { --glow-delay: -1.75s; }
+        .kpi:nth-child(3) { --glow-delay: -3.5s; }
+        .kpi:nth-child(4) { --glow-delay: -5.25s; }
+        .panel.glow-border { --glow-speed: 11s; }
+        .panel.glow-border:nth-of-type(3) { --glow-delay: -4s; }
+        .panel.glow-border:nth-of-type(4) { --glow-delay: -8s; }
+        .input-box.glow-border { --glow-speed: 9s; }
+
+        @keyframes border-run {
+            to {
+                --run: 360deg;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .glow-border::before {
+                display: none;
+            }
+        }
+
+        /* Report filter */
+        .rep-filters {
+            margin-bottom: 10px;
+        }
+
+        .f-grow {
+            flex: 1 1 220px;
+            min-width: 0;
+        }
+
+        .sel {
+            width: 100%;
+            font-family: var(--body);
+            font-size: 13px;
+            color: var(--text);
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 10px;
+            outline: none;
+            cursor: pointer;
+            transition: background 0.3s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .sel:focus {
+            border-color: var(--accent);
+            box-shadow: var(--focus-shadow);
+        }
+
+        .rep-active {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--accent);
+            background: var(--accent-bg);
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-bottom: 10px;
+        }
+
+        .rep-active[hidden] {
+            display: none;
+        }
+
+        .link-btn {
+            font: inherit;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--muted);
+            background: none;
+            border: none;
+            text-decoration: underline;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .link-btn:hover {
+            color: var(--text);
+        }
+
+        .sub-h {
+            font-family: var(--display);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            margin: 26px 0 6px;
+        }
+
+        .report .empty-cell {
+            text-align: center;
+            color: var(--muted);
+            padding: 28px 0;
+        }
+
+        /* By-item-name chips inside an open detail */
+        .d-sub {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin: 4px 0 6px;
+        }
+
+        .d-sub small {
+            font-weight: 400;
+            letter-spacing: 0;
+            text-transform: none;
+            margin-left: 6px;
+        }
+
+        .name-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 10px;
+            max-height: 132px;
+            overflow-y: auto;
+        }
+
+        .name-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--body);
+            font-size: 11px;
+            color: var(--text);
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 4px 8px;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .name-chip b {
+            font-family: var(--mono);
+            font-weight: 600;
+        }
+
+        .name-chip span {
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--muted);
+        }
+
+        .name-chip:hover {
+            border-color: var(--accent-hover);
+        }
+
+        .name-chip.on {
+            background: var(--accent-bg);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .d-item[hidden] {
+            display: none;
+        }
+
         @media print {
 
             body,
@@ -1389,6 +1616,7 @@
                 --other: #8C959F;
                 padding: 0;
                 cursor: default;
+                background-image: none;
             }
 
             * {
@@ -1403,6 +1631,9 @@
             .report-fallback,
             .report-hint,
             .chev,
+            #flow,
+            .glow-border::before,
+            .link-btn,
             .filters,
             .filter-panel .panel-h small,
             footer {
@@ -1579,6 +1810,9 @@
 
 <body>
 
+    <!-- Animated circuit lines behind the page -->
+    <canvas id="flow" aria-hidden="true"></canvas>
+
     <div class="top-actions">
 
         <!-- Refresh Button -->
@@ -1629,7 +1863,7 @@
     </nav>
 
     <div class="search-wrap">
-        <div class="input-box">
+        <div class="input-box glow-border">
             <span class="search-ico">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round">
@@ -1666,13 +1900,13 @@
         <div id="dashContent" hidden>
             <div class="kpis" id="kpis"></div>
 
-            <div class="panel">
+            <div class="panel glow-border">
                 <div class="panel-h">Stock split <small>share of total units</small></div>
                 <div class="split" id="split"></div>
                 <div class="legend" id="legend"></div>
             </div>
 
-            <div class="panel">
+            <div class="panel glow-border">
                 <div class="panel-h">
                     <span>Stock report <small id="reportDate"></small></span>
                     <span class="report-actions">
@@ -1680,15 +1914,38 @@
                         <button class="chip" id="printReport" title="Print or save as PDF">Print / PDF</button>
                     </span>
                 </div>
+                <div class="filters rep-filters">
+                    <div class="f-group">
+                        <span class="f-lbl">Category</span>
+                        <div class="seg" id="rCat">
+                            <button class="chip" data-cat="all">All</button>
+                            <button class="chip" data-cat="ladies"><span class="swatch" style="background:var(--ladies)"></span>Ladies</button>
+                            <button class="chip" data-cat="men"><span class="swatch" style="background:var(--men)"></span>Men</button>
+                            <button class="chip" data-cat="other"><span class="swatch" style="background:var(--other)"></span>Other</button>
+                        </div>
+                    </div>
+                    <div class="f-group f-grow">
+                        <label class="f-lbl" for="rType">Product type</label>
+                        <select class="sel" id="rType"></select>
+                    </div>
+                </div>
+                <p class="rep-active" id="repActive" hidden>
+                    <span id="repActiveText"></span>
+                    <button class="link-btn" id="repClear">Clear filter</button>
+                </p>
                 <p class="report-hint">Tap any row to see the SKUs behind it and check the total.</p>
                 <div class="report-wrap">
                     <table class="report" id="report"></table>
+                </div>
+                <div class="sub-h">By product type</div>
+                <div class="report-wrap">
+                    <table class="report" id="typeTable"></table>
                 </div>
                 <textarea class="report-fallback" id="reportFallback" readonly hidden
                     aria-label="Report text to copy"></textarea>
             </div>
 
-            <div class="panel filter-panel">
+            <div class="panel glow-border filter-panel">
                 <div class="panel-h">Stock filter <small>tap a row to open it in Lookup</small></div>
                 <div class="filters">
                     <div class="f-group">
@@ -2041,6 +2298,41 @@
             return name ? name.toLowerCase().replace(/\b\w/g, c => c.toUpperCase()) : 'Unnumbered';
         }
 
+        // Product type: the main type from Item Name, tolerant of the sheet's typos
+        // (STRAIGHT FIR / STARIGHT FIT → Straight Fit, WIDE EG → Wide Leg)
+        function cleanName(row) {
+            return String(row['Item Name'] || '').toUpperCase().trim().replace(/\s+/g, ' ');
+        }
+
+        function typeOf(row) {
+            const n = cleanName(row);
+            if (!n) return 'No item name';
+            if (/^NARROW\b/.test(n)) return 'Narrow';
+            if (/^ST\w*\s+FI[TR]\b/.test(n)) return 'Straight Fit';
+            if (/^WIDE\s+L?EG\b/.test(n)) return 'Wide Leg';
+            const m = n.match(/^(BELL BOTTOM|BOOTCUT|ALTER|JACKET|SAMPLES?)\b/);
+            return titleCase(m ? m[1] : n);
+        }
+
+        function titleCase(s) {
+            return s.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+        }
+
+        // Report filter: category + product type ("all", "T:<type>" or "N:<exact item name>")
+        const rep = { cat: 'all', type: 'all' };
+        try {
+            const saved = JSON.parse(localStorage.getItem('repFilters') || '{}');
+            if (saved.cat === 'all' || saved.cat in CATS) rep.cat = saved.cat;
+            if (typeof saved.type === 'string') rep.type = saved.type;
+        } catch (e) { }
+
+        function repRows() {
+            return data.filter(r =>
+                (rep.cat === 'all' || categoryOf(r['SKU Code']) === rep.cat) &&
+                (rep.type === 'all' ||
+                    (rep.type.startsWith('T:') ? typeOf(r) === rep.type.slice(2) : cleanName(r) === rep.type.slice(2))));
+        }
+
         // Filter choices are remembered per browser
         const dash = { min: 50, cat: 'all', group: 'size' };
         try {
@@ -2099,14 +2391,19 @@
         }
 
         /* ─── Totals: KPI tiles, split bar, report table ─── */
-        let report = null; // last computed totals, reused by Copy report
+        let report = null; // last computed report, reused by Copy report
 
-        function renderSummary() {
+        const lineTotal = l => (l.ladies || 0) + (l.men || 0) + (l.other || 0);
+        const sumOf = (list, k) => list.reduce((s, l) => s + (l[k] || 0), 0);
+
+        // Totals per category, plus Narrow / Without-narrow lines and product types, for a set of rows
+        function computeTotals(rows) {
             const tally = () => ({ units: 0, sizes: 0, articles: new Set() });
             const t = { all: tally(), ladies: tally(), men: tally(), other: tally() };
             const buckets = new Map(); // report line → units per category
+            const types = new Map();   // product type → units per category
 
-            data.forEach(row => {
+            rows.forEach(row => {
                 const sku = String(row['SKU Code'] || '').trim();
                 const cat = categoryOf(sku);
                 const units = toNum(row['Closing Stock']);
@@ -2121,18 +2418,27 @@
                 const line = buckets.get(key) || { narrow, name: bucketOf(sku) };
                 line[cat] = (line[cat] || 0) + units;
                 buckets.set(key, line);
+                const ty = typeOf(row);
+                const tl = types.get(ty) || { name: ty, sizes: 0 };
+                tl[cat] = (tl[cat] || 0) + units;
+                tl.sizes++;
+                types.set(ty, tl);
             });
 
             // Within each section: Articles first, then the rest by size
-            const lineTotal = l => (l.ladies || 0) + (l.men || 0) + (l.other || 0);
             const sorted = list => list.sort((a, b) =>
                 (a.name !== 'Articles') - (b.name !== 'Articles') || lineTotal(b) - lineTotal(a));
-            const narrowLines = sorted([...buckets.values()].filter(l => l.narrow));
-            const regularLines = sorted([...buckets.values()].filter(l => !l.narrow));
-            const sumOf = (list, k) => list.reduce((s, l) => s + (l[k] || 0), 0);
-            const cats = Object.keys(CATS).filter(k => t[k].sizes > 0);
-            report = { t, cats, narrowLines, regularLines, sumOf };
+            return {
+                t,
+                cats: Object.keys(CATS).filter(k => t[k].sizes > 0),
+                narrowLines: sorted([...buckets.values()].filter(l => l.narrow)),
+                regularLines: sorted([...buckets.values()].filter(l => !l.narrow)),
+                typeLines: [...types.values()].sort((a, b) => lineTotal(b) - lineTotal(a) || b.sizes - a.sizes),
+            };
+        }
 
+        function renderSummary() {
+            const { t, cats, narrowLines } = computeTotals(data);
             const pct = n => t.all.units ? n / t.all.units * 100 : 0;
             const mixOf = k => sumOf(narrowLines, k);
             const mixAll = cats.reduce((s, k) => s + mixOf(k), 0);
@@ -2145,7 +2451,7 @@
           </div>`;
 
             const tile = (label, x, sub, color, mix) => `
-        <div class="kpi">
+        <div class="kpi glow-border">
           <div class="kpi-lbl">${color ? `<span class="swatch" style="background:${color}"></span>` : ''}${label}</div>
           <div class="kpi-num">${fmt(x.units)}</div>
           <div class="kpi-sub">${fmt(x.articles.size)} articles · ${fmt(x.sizes)} sizes<br>${sub}</div>
@@ -2156,35 +2462,6 @@
                 Object.keys(CATS).map(k =>
                     tile(CATS[k].label, t[k], `${pct(t[k].units).toFixed(1)}% of total`, CATS[k].color, mixOf(k))
                 ).join('');
-
-            // Report table: a Narrow section and a Without-narrow section, each with a subtotal
-            const cell = v => v === undefined ? '<td class="nil">—</td>' : `<td>${fmt(v)}</td>`;
-            // data-key = section|line ("*" = whole section); tapping a row lists its SKUs
-            const row = (cls, name, l, key) => `<tr class="${cls} drill" data-key="${esc(key)}" tabindex="0" aria-expanded="false">
-          <td><span class="chev">▸</span>${esc(name)}</td>${cats.map(k => cell(l[k])).join('')}<td class="col-total">${fmt(lineTotal(l))}</td>
-        </tr>`;
-            const subtotal = list => Object.fromEntries(cats.map(k => [k, sumOf(list, k)]));
-            const section = (title, list, cls, totalLabel) => {
-                if (!list.length) return '';
-                const sec = cls === 'nar' ? 'N' : 'R';
-                return `<tr class="sec"><td colspan="${cats.length + 2}">${title}</td></tr>` +
-                    list.map(l => row(cls, l.name, l, sec + '|' + l.name)).join('') +
-                    row(cls + ' subtot', totalLabel, subtotal(list), sec + '|*');
-            };
-            document.getElementById('report').innerHTML = `
-        <thead><tr>
-          <th>Stock type</th>
-          ${cats.map(k => `<th><span class="swatch" style="background:${CATS[k].color}"></span>${CATS[k].label}</th>`).join('')}
-          <th>Total</th>
-        </tr></thead>
-        <tbody>
-          ${section('Narrow', narrowLines, 'nar', 'Narrow total')}
-          ${section('Without narrow', regularLines, 'reg', 'Without narrow total')}
-        </tbody>
-        <tfoot><tr>
-          <td>Total</td>${cats.map(k => `<td>${fmt(t[k].units)}</td>`).join('')}<td>${fmt(t.all.units)}</td>
-        </tr></tfoot>`;
-            document.getElementById('reportDate').textContent = loadedAt ? '· as of ' + stamp(loadedAt) : '';
 
             // Each category's bar is split into its regular stock (solid) and Narrow (striped)
             const segs = [];
@@ -2209,7 +2486,118 @@
           <span class="swatch hatch" style="--c:var(--muted)"></span>Striped = Narrow
           <b>${fmt(mixAll)}</b><span class="pct">${pct(mixAll).toFixed(1)}%</span>
         </span>` : '');
+
+            renderReport();
         }
+
+        /* ─── Stock report: filtered by category + product type ─── */
+        const reportEl = document.getElementById('report');
+        const typeEl = document.getElementById('typeTable');
+        const rTypeSel = document.getElementById('rType');
+
+        function renderReport() {
+            renderRepFilters();
+            const rows = repRows();
+            const { t, cats, narrowLines, regularLines, typeLines } = computeTotals(rows);
+            report = { t, cats, narrowLines, regularLines, typeLines, label: repLabel() };
+
+            const cell = v => v === undefined ? '<td class="nil">—</td>' : `<td>${fmt(v)}</td>`;
+            const head = first => `<thead><tr>
+          <th>${first}</th>
+          ${cats.map(k => `<th><span class="swatch" style="background:${CATS[k].color}"></span>${CATS[k].label}</th>`).join('')}
+          <th>Total</th>
+        </tr></thead>`;
+            const foot = `<tfoot><tr>
+          <td>Total</td>${cats.map(k => `<td>${fmt(t[k].units)}</td>`).join('')}<td>${fmt(t.all.units)}</td>
+        </tr></tfoot>`;
+            // data-key says which SKUs a row stands for; tapping the row lists them
+            const row = (cls, name, l, key) => `<tr class="${cls} drill" data-key="${esc(key)}" tabindex="0" aria-expanded="false">
+          <td><span class="chev">▸</span>${esc(name)}</td>${cats.map(k => cell(l[k])).join('')}<td class="col-total">${fmt(lineTotal(l))}</td>
+        </tr>`;
+
+            if (!rows.length) {
+                reportEl.innerHTML = `<tbody><tr><td class="empty-cell">No stock matches this filter.</td></tr></tbody>`;
+                typeEl.innerHTML = '';
+                return;
+            }
+
+            // Stock type table: a Narrow section and a Without-narrow section, each with a subtotal
+            const subtotal = list => Object.fromEntries(cats.map(k => [k, sumOf(list, k)]));
+            const section = (title, list, cls, totalLabel) => {
+                if (!list.length) return '';
+                const sec = cls === 'nar' ? 'N' : 'R';
+                return `<tr class="sec"><td colspan="${cats.length + 2}">${title}</td></tr>` +
+                    list.map(l => row(cls, l.name, l, 'S|' + sec + '|' + l.name)).join('') +
+                    row(cls + ' subtot', totalLabel, subtotal(list), 'S|' + sec + '|*');
+            };
+            reportEl.innerHTML = head('Stock type') + `<tbody>
+          ${section('Narrow', narrowLines, 'nar', 'Narrow total')}
+          ${section('Without narrow', regularLines, 'reg', 'Without narrow total')}
+        </tbody>` + foot;
+
+            // Product type table: one row per main type (Straight Fit, Wide Leg…)
+            typeEl.innerHTML = head('Product type') +
+                `<tbody>${typeLines.map(l => row(l.name === 'Narrow' ? 'nar' : 'reg', l.name, l, 'T|' + l.name)).join('')}</tbody>` + foot;
+
+            document.getElementById('reportDate').textContent = loadedAt ? '· as of ' + stamp(loadedAt) : '';
+        }
+
+        // Product type dropdown: main types, with their exact item names under each
+        function renderRepFilters() {
+            document.querySelectorAll('#rCat .chip').forEach(c => c.classList.toggle('on', c.dataset.cat === rep.cat));
+
+            const inCat = data.filter(r => rep.cat === 'all' || categoryOf(r['SKU Code']) === rep.cat);
+            const groups = new Map();
+            inCat.forEach(r => {
+                const ty = typeOf(r);
+                const g = groups.get(ty) || { units: 0, names: new Map() };
+                const u = toNum(r['Closing Stock']);
+                g.units += u;
+                const n = cleanName(r);
+                if (n) g.names.set(n, (g.names.get(n) || 0) + u);
+                groups.set(ty, g);
+            });
+            // keep a saved choice even if this category has none of it
+            const known = rep.type === 'all' ||
+                [...groups.entries()].some(([ty, g]) => rep.type === 'T:' + ty || (rep.type.startsWith('N:') && g.names.has(rep.type.slice(2))));
+            if (!known) rep.type = 'all';
+
+            const total = inCat.reduce((s, r) => s + toNum(r['Closing Stock']), 0);
+            rTypeSel.innerHTML = `<option value="all">All product types · ${fmt(total)}</option>` +
+                [...groups.entries()].sort((a, b) => b[1].units - a[1].units).map(([ty, g]) => {
+                    const names = [...g.names.entries()].sort((a, b) => b[1] - a[1]);
+                    const showNames = names.length > 1 || (names.length === 1 && titleCase(names[0][0]) !== ty);
+                    return `<optgroup label="${esc(ty)}">
+              <option value="${esc('T:' + ty)}">All ${esc(ty)} · ${fmt(g.units)}</option>
+              ${showNames ? names.map(([n, u]) => `<option value="${esc('N:' + n)}">${esc(titleCase(n))} · ${fmt(u)}</option>`).join('') : ''}
+            </optgroup>`;
+                }).join('');
+            rTypeSel.value = rep.type;
+
+            const active = rep.cat !== 'all' || rep.type !== 'all';
+            document.getElementById('repActive').hidden = !active;
+            document.getElementById('repActiveText').textContent = repLabel();
+        }
+
+        function repLabel() {
+            const parts = [];
+            if (rep.cat !== 'all') parts.push(CATS[rep.cat].label);
+            if (rep.type !== 'all') parts.push(rep.type.startsWith('T:') ? rep.type.slice(2) : titleCase(rep.type.slice(2)));
+            return parts.length ? 'Showing: ' + parts.join(' · ') : '';
+        }
+
+        function setRep(changes) {
+            Object.assign(rep, changes);
+            try { localStorage.setItem('repFilters', JSON.stringify(rep)); } catch (e) { }
+            renderReport();
+        }
+
+        document.getElementById('rCat').addEventListener('click', e => {
+            const c = e.target.closest('.chip');
+            if (c) setRep({ cat: c.dataset.cat });
+        });
+        rTypeSel.addEventListener('change', () => setRep({ type: rTypeSel.value }));
+        document.getElementById('repClear').addEventListener('click', () => setRep({ cat: 'all', type: 'all' }));
 
         // Split-bar tooltip (hover or keyboard focus)
         function showTip(seg) {
@@ -2231,54 +2619,70 @@
         splitEl.addEventListener('focusout', hideTip);
 
         /* ─── Report drill-down: tap a row to list the SKUs that make up its numbers ─── */
-        const reportEl = document.getElementById('report');
+        [reportEl, typeEl].forEach(el => {
+            el.addEventListener('click', e => {
+                const chip = e.target.closest('.name-chip');
+                if (chip) { filterDetail(chip); return; }
+                const item = e.target.closest('.d-item');
+                if (item) { openInLookup(item.dataset.art); return; }
+                const tr = e.target.closest('tr.drill');
+                if (tr) toggleDetail(tr);
+            });
+            el.addEventListener('keydown', e => {
+                const tr = e.target.closest('tr.drill');
+                if (tr && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggleDetail(tr); }
+            });
+        });
 
-        reportEl.addEventListener('click', e => {
-            const item = e.target.closest('.d-item');
-            if (item) { openInLookup(item.dataset.art); return; }
-            const tr = e.target.closest('tr.drill');
-            if (tr) toggleDetail(tr);
-        });
-        reportEl.addEventListener('keydown', e => {
-            const tr = e.target.closest('tr.drill');
-            if (tr && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggleDetail(tr); }
-        });
+        // key: "S|N|Mix" / "S|R|*" (stock type rows) or "T|Wide Leg" (product type rows)
+        function rowsForKey(key) {
+            const [kind, a, b] = key.split('|');
+            return repRows().filter(r => kind === 'T'
+                ? typeOf(r) === a
+                : isNarrow(r) === (a === 'N') && (b === '*' || bucketOf(r['SKU Code']) === b));
+        }
 
         function toggleDetail(tr) {
             const wasOpen = tr.classList.contains('open');
-            reportEl.querySelectorAll('tr.detail').forEach(d => d.remove());
-            reportEl.querySelectorAll('tr.drill.open').forEach(d => {
+            document.querySelectorAll('.report tr.detail').forEach(d => d.remove());
+            document.querySelectorAll('.report tr.drill.open').forEach(d => {
                 d.classList.remove('open');
                 d.setAttribute('aria-expanded', 'false');
             });
             if (wasOpen) return;
 
-            const [sec, name] = tr.dataset.key.split('|');
             const order = { ladies: 0, men: 1, other: 2 };
-            const items = data
-                .filter(r => isNarrow(r) === (sec === 'N') && (name === '*' || bucketOf(r['SKU Code']) === name))
+            const items = rowsForKey(tr.dataset.key)
                 .map(r => {
                     const raw = r['Closing Stock'];
                     const sku = String(r['SKU Code'] || '').trim();
                     return {
-                        sku, art: sku.split(' ')[0], name: r['Item Name'] || '', cat: categoryOf(sku),
+                        sku, art: sku.split(' ')[0], name: cleanName(r), cat: categoryOf(sku),
                         stock: raw === '' || raw === null || raw === undefined ? null : toNum(raw),
                     };
                 })
                 .sort((a, b) => order[a.cat] - order[b.cat] || (b.stock ?? -1) - (a.stock ?? -1));
 
             const byCat = {};
-            items.forEach(i => { byCat[i.cat] = (byCat[i.cat] || 0) + (i.stock || 0); });
+            const byName = new Map();
+            items.forEach(i => {
+                byCat[i.cat] = (byCat[i.cat] || 0) + (i.stock || 0);
+                const n = byName.get(i.name) || { units: 0, skus: 0 };
+                n.units += i.stock || 0;
+                n.skus++;
+                byName.set(i.name, n);
+            });
             const sum = items.reduce((s, i) => s + (i.stock || 0), 0);
             const shown = Number(tr.querySelector('.col-total').textContent.replace(/[^\d]/g, ''));
             const label = tr.querySelector('td').textContent.replace('▸', '').trim();
-            const section = sec === 'N' ? 'Narrow' : 'Without narrow';
+            const kind = tr.dataset.key.split('|');
+            const where = kind[0] === 'T' ? 'Product type' : kind[1] === 'N' ? 'Narrow' : 'Without narrow';
 
             tr.insertAdjacentHTML('afterend', `
         <tr class="detail"><td colspan="${tr.children.length}">
           <div class="detail-box">
             <div class="detail-head">
-              <span><b>${esc(label)}</b> · ${section} · ${fmt(items.length)} SKU${items.length === 1 ? '' : 's'}</span>
+              <span><b>${esc(label)}</b> · ${where} · ${fmt(items.length)} SKU${items.length === 1 ? '' : 's'}</span>
               <span class="detail-check ${sum === shown ? 'ok' : 'bad'}">
                 Sum ${fmt(sum)} ${sum === shown ? '= report ✓' : '≠ report ' + fmt(shown)}
               </span>
@@ -2286,8 +2690,13 @@
             <div class="detail-split">${Object.keys(order).filter(k => k in byCat).map(k =>
                 `<span><span class="swatch" style="background:${CATS[k].color}"></span>${CATS[k].label} <b>${fmt(byCat[k])}</b></span>`).join('')}
             </div>
+            ${byName.size > 1 ? `<div class="d-sub">By item name <small>tap to show only that item</small></div>
+            <div class="name-chips">${[...byName.entries()].sort((a, b) => b[1].units - a[1].units || b[1].skus - a[1].skus).map(([n, v]) => `
+              <button class="name-chip" data-name="${esc(n)}">${esc(n ? titleCase(n) : 'No item name')}
+                <b>${fmt(v.units)}</b><span>${v.skus} SKU${v.skus === 1 ? '' : 's'}</span></button>`).join('')}
+            </div>` : ''}
             <div class="detail-list">${items.map(i => `
-              <div class="d-item" data-art="${esc(i.art)}" title="Open ${esc(i.art)} in Lookup">
+              <div class="d-item" data-art="${esc(i.art)}" data-name="${esc(i.name)}" title="Open ${esc(i.art)} in Lookup">
                 <span class="d-main">
                   <span class="d-sku">${esc(i.sku)}</span>
                   <span class="d-name">${esc(i.name)}</span>
@@ -2304,16 +2713,26 @@
             tr.nextElementSibling.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
         }
 
+        // Item-name chip inside an open detail: show only that item's SKUs (tap again for all)
+        function filterDetail(chip) {
+            const box = chip.closest('.detail-box');
+            const on = !chip.classList.contains('on');
+            box.querySelectorAll('.name-chip').forEach(c => c.classList.toggle('on', on && c === chip));
+            box.querySelectorAll('.d-item').forEach(i => { i.hidden = on && i.dataset.name !== chip.dataset.name; });
+            box.querySelector('.detail-list').scrollTop = 0;
+        }
+
         /* ─── Share: copy as WhatsApp-ready text, or print / save PDF ─── */
         function reportText() {
-            const { t, cats, narrowLines, regularLines, sumOf } = report;
+            const { t, cats, narrowLines, regularLines, typeLines, label } = report;
             const pct = n => t.all.units ? (n / t.all.units * 100).toFixed(1) + '%' : '0%';
             const out = [
                 '*John DV — Stock Report*',
                 loadedAt ? 'As of ' + stamp(loadedAt) : '',
+                label ? '_' + label + '_' : '',
                 '',
                 `*Total stock: ${fmt(t.all.units)} units*`,
-            ];
+            ].filter((l, i) => l || i === 3);
             cats.forEach(k => {
                 out.push('', `*${CATS[k].label}: ${fmt(t[k].units)}* (${pct(t[k].units)})`);
                 [['Narrow', narrowLines], ['Without narrow', regularLines]].forEach(([title, list]) => {
@@ -2323,6 +2742,15 @@
                     list.forEach(l => { if (l[k]) out.push(`   • ${l.name}: ${fmt(l[k])}`); });
                 });
             });
+            const types = typeLines.filter(l => lineTotal(l));
+            if (types.length > 1) {
+                out.push('', '*By product type*');
+                types.forEach(l => {
+                    const split = cats.length > 1
+                        ? ' (' + cats.filter(k => l[k]).map(k => CATS[k].label + ' ' + fmt(l[k])).join(' · ') + ')' : '';
+                    out.push(`• ${l.name}: ${fmt(lineTotal(l))}${split}`);
+                });
+            }
             return out.join('\n');
         }
 
@@ -2496,6 +2924,162 @@
         function esc(s) {
             return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
         }
+
+        /* ─── Background: circuit lines with glowing pulses travelling along them ─── */
+        (function flowLines() {
+            const cv = document.getElementById('flow');
+            const ctx = cv.getContext && cv.getContext('2d');
+            if (!ctx) return;
+            const still = window.matchMedia('(prefers-reduced-motion: reduce)');
+            const CELL = 44;   // lines snap to a grid, like a circuit board
+            const TRAIL = 80;  // pulse tail length in px
+            let W = 0, H = 0, paths = [], col = {}, raf = 0, last = 0;
+
+            // seeded random, so the layout stays the same on every load
+            function rng(seed) {
+                return () => {
+                    seed = (seed + 0x6D2B79F5) | 0;
+                    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+                    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+                    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+                };
+            }
+
+            function readColors() {
+                const cs = getComputedStyle(document.body);
+                col = { line: cs.getPropertyValue('--flow-line').trim(), glow: cs.getPropertyValue('--flow-glow').trim() };
+            }
+
+            function build() {
+                const dpr = Math.min(window.devicePixelRatio || 1, 2);
+                W = window.innerWidth;
+                H = window.innerHeight;
+                cv.width = Math.round(W * dpr);
+                cv.height = Math.round(H * dpr);
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+                const rand = rng(11);
+                const cols = Math.floor(W / CELL), rows = Math.floor(H / CELL);
+                const count = Math.max(5, Math.min(16, Math.round(W * H / 75000)));
+                paths = [];
+                for (let i = 0; i < count; i++) {
+                    let x = Math.floor(rand() * (cols + 1)), y = Math.floor(rand() * (rows + 1));
+                    const pts = [[x * CELL, y * CELL]];
+                    let horiz = rand() < 0.5;
+                    const turns = 2 + Math.floor(rand() * 3);
+                    for (let j = 0; j < turns; j++) {
+                        const step = (2 + Math.floor(rand() * 6)) * (rand() < 0.5 ? -1 : 1);
+                        if (horiz) x = Math.max(0, Math.min(cols, x + step));
+                        else y = Math.max(0, Math.min(rows, y + step));
+                        const prev = pts[pts.length - 1];
+                        if (prev[0] !== x * CELL || prev[1] !== y * CELL) pts.push([x * CELL, y * CELL]);
+                        horiz = !horiz;
+                    }
+                    if (pts.length < 2) continue;
+                    const segs = [];
+                    let total = 0;
+                    for (let k = 1; k < pts.length; k++) {
+                        const len = Math.abs(pts[k][0] - pts[k - 1][0]) + Math.abs(pts[k][1] - pts[k - 1][1]);
+                        segs.push(len);
+                        total += len;
+                    }
+                    paths.push({ pts, segs, total, off: rand() * total, speed: 45 + rand() * 55, gap: 60 + rand() * 260 });
+                }
+            }
+
+            // point at distance d along a path
+            function at(p, d) {
+                for (let k = 0; k < p.segs.length; k++) {
+                    if (d <= p.segs[k]) {
+                        const [x0, y0] = p.pts[k], [x1, y1] = p.pts[k + 1], f = p.segs[k] ? d / p.segs[k] : 0;
+                        return [x0 + (x1 - x0) * f, y0 + (y1 - y0) * f];
+                    }
+                    d -= p.segs[k];
+                }
+                return p.pts[p.pts.length - 1];
+            }
+
+            function draw(dt) {
+                ctx.clearRect(0, 0, W, H);
+                ctx.lineWidth = 1.5;
+                ctx.lineJoin = 'round';
+                ctx.strokeStyle = col.line;
+                ctx.fillStyle = col.glow;
+
+                paths.forEach(p => {
+                    // the line, with softly rounded corners
+                    ctx.beginPath();
+                    ctx.moveTo(p.pts[0][0], p.pts[0][1]);
+                    for (let k = 1; k < p.pts.length - 1; k++) ctx.arcTo(p.pts[k][0], p.pts[k][1], p.pts[k + 1][0], p.pts[k + 1][1], 8);
+                    ctx.lineTo(p.pts[p.pts.length - 1][0], p.pts[p.pts.length - 1][1]);
+                    ctx.stroke();
+
+                    // nodes at both ends
+                    ctx.globalAlpha = 0.8;
+                    [p.pts[0], p.pts[p.pts.length - 1]].forEach(([x, y]) => {
+                        ctx.beginPath();
+                        ctx.arc(x, y, 3, 0, Math.PI * 2);
+                        ctx.fill();
+                    });
+                    ctx.globalAlpha = 1;
+
+                    // the pulse: a bright head with a fading tail; rests for a moment between laps
+                    p.off = (p.off + p.speed * dt) % (p.total + TRAIL + p.gap);
+                    if (p.off > p.total + TRAIL) return;
+                    const STEPS = 16;
+                    for (let s = STEPS; s >= 0; s--) {
+                        const d = p.off - (s * TRAIL) / STEPS;
+                        if (d < 0 || d > p.total) continue;
+                        const [x, y] = at(p, d);
+                        ctx.globalAlpha = (1 - s / STEPS) * 0.85;
+                        ctx.beginPath();
+                        ctx.arc(x, y, 2.6 - s * 0.1, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    if (p.off <= p.total) {
+                        const [x, y] = at(p, p.off);
+                        ctx.globalAlpha = 1;
+                        ctx.shadowColor = col.glow;
+                        ctx.shadowBlur = 14;
+                        ctx.beginPath();
+                        ctx.arc(x, y, 3.2, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.shadowBlur = 0;
+                    }
+                    ctx.globalAlpha = 1;
+                });
+            }
+
+            function frame(ts) {
+                const dt = Math.min(0.05, (ts - last) / 1000 || 0);
+                last = ts;
+                draw(dt);
+                raf = requestAnimationFrame(frame);
+            }
+
+            // reduced motion or hidden tab: draw one still frame, no loop
+            function start() {
+                cancelAnimationFrame(raf);
+                if (still.matches || document.hidden) { draw(0); return; }
+                last = performance.now();
+                raf = requestAnimationFrame(frame);
+            }
+
+            let resizeTimer = null;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => { build(); start(); }, 150);
+            });
+            document.addEventListener('visibilitychange', start);
+            if (still.addEventListener) still.addEventListener('change', start);
+            // recolor when dark mode is toggled
+            new MutationObserver(() => { readColors(); if (still.matches) draw(0); })
+                .observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
+            readColors();
+            build();
+            start();
+        })();
     </script>
 
 </body>
