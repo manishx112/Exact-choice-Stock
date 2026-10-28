@@ -1456,6 +1456,70 @@
             }
         }
 
+        /* Neon (background lines + border lights) is a dark-mode look only */
+        body:not(.theme-dark) #flow,
+        body:not(.theme-dark) .glow-border::before {
+            display: none;
+        }
+
+        /* ── Fly-in: cards travel from off to the side and settle into place ── */
+        @keyframes fly-in {
+            0% {
+                opacity: 0;
+                transform: translate(var(--fx, 0), var(--fy, 60px)) scale(0.88) rotate(var(--fr, 0deg));
+            }
+
+            55% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        /* Page load: header pieces drop in, search box rises */
+        .page-enter .brand-eye,
+        .page-enter h1,
+        .page-enter .tabs,
+        .page-enter .search-wrap {
+            animation: fly-in 0.8s cubic-bezier(0.2, 0.85, 0.25, 1.12) both;
+        }
+
+        .page-enter .brand-eye { --fy: -40px; }
+        .page-enter h1 { --fy: -30px; animation-delay: 0.08s; }
+        .page-enter .tabs { --fy: 30px; animation-delay: 0.16s; }
+        .page-enter .search-wrap { --fy: 70px; animation-delay: 0.24s; }
+
+        /* Dashboard: each tile comes from a different side, panels rise one after another */
+        #dashContent.enter {
+            overflow-x: clip;
+            overflow-clip-margin: 6px;
+        }
+
+        #dashContent.enter .kpi,
+        #dashContent.enter .panel {
+            animation: fly-in 0.9s cubic-bezier(0.2, 0.85, 0.25, 1.12) both;
+        }
+
+        #dashContent.enter .kpi:nth-child(1) { --fx: -160px; --fy: 0px; --fr: -6deg; }
+        #dashContent.enter .kpi:nth-child(2) { --fx: 0px; --fy: -110px; --fr: 3deg; animation-delay: 0.08s; }
+        #dashContent.enter .kpi:nth-child(3) { --fx: 0px; --fy: 110px; --fr: -3deg; animation-delay: 0.16s; }
+        #dashContent.enter .kpi:nth-child(4) { --fx: 160px; --fy: 0px; --fr: 6deg; animation-delay: 0.24s; }
+        #dashContent.enter .panel { --fy: 90px; }
+        #dashContent.enter .panel:nth-of-type(2) { animation-delay: 0.3s; }
+        #dashContent.enter .panel:nth-of-type(3) { animation-delay: 0.42s; }
+        #dashContent.enter .panel:nth-of-type(4) { animation-delay: 0.54s; }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .page-enter *,
+            #dashContent.enter * {
+                animation: none !important;
+            }
+        }
+
         /* Report filter */
         .rep-filters {
             margin-bottom: 10px;
@@ -1808,7 +1872,7 @@
     </style>
 </head>
 
-<body>
+<body class="page-enter">
 
     <!-- Animated circuit lines behind the page -->
     <canvas id="flow" aria-hidden="true"></canvas>
@@ -2002,6 +2066,9 @@
         if (localStorage.getItem('theme') === 'dark') {
             document.body.classList.add('theme-dark');
         }
+
+        // Header and search fly in once on page load
+        setTimeout(() => document.body.classList.remove('page-enter'), 1600);
 
         // Toggle theme on empty background click
         document.addEventListener('click', (e) => {
@@ -2358,7 +2425,21 @@
                 t.classList.toggle('active', on);
                 t.setAttribute('aria-selected', on);
             });
-            if (onDash) renderDashboard();
+            if (onDash) {
+                renderDashboard();
+                playEnter(document.getElementById('dashContent'));
+            }
+        }
+
+        // Replays the fly-in animation on an element (class is removed again when done,
+        // so later data refreshes don't replay it)
+        function playEnter(el) {
+            if (!el || el.hidden) return;
+            el.classList.remove('enter');
+            void el.offsetWidth; // restart the CSS animation
+            el.classList.add('enter');
+            clearTimeout(el._enterTimer);
+            el._enterTimer = setTimeout(() => el.classList.remove('enter'), 1800);
         }
 
         function renderDashboard() {
@@ -2384,10 +2465,13 @@
             }
 
             stateEl.innerHTML = '';
+            const firstShow = contentEl.hidden;
             contentEl.hidden = false;
             renderSummary();
             syncFilterChips();
             renderList();
+            // data just arrived while the dashboard was open: fly the cards in
+            if (firstShow) playEnter(contentEl);
         }
 
         /* ─── Totals: KPI tiles, split bar, report table ─── */
@@ -3058,9 +3142,14 @@
             }
 
             // reduced motion or hidden tab: draw one still frame, no loop
+            const isDark = () => document.body.classList.contains('theme-dark');
+
             function start() {
                 cancelAnimationFrame(raf);
-                if (still.matches || document.hidden) { draw(0); return; }
+                // neon is a dark-mode look: in light mode clear the canvas and stop
+                if (!isDark()) { ctx.clearRect(0, 0, W, H); return; }
+                draw(0); // paint right away, don't wait for the first animation frame
+                if (still.matches || document.hidden) return;
                 last = performance.now();
                 raf = requestAnimationFrame(frame);
             }
@@ -3073,7 +3162,7 @@
             document.addEventListener('visibilitychange', start);
             if (still.addEventListener) still.addEventListener('change', start);
             // recolor when dark mode is toggled
-            new MutationObserver(() => { readColors(); if (still.matches) draw(0); })
+            new MutationObserver(() => { readColors(); start(); })
                 .observe(document.body, { attributes: true, attributeFilter: ['class'] });
 
             readColors();
